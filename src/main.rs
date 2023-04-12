@@ -4,6 +4,8 @@ use nannou::prelude::*;
 use cavalier_contours::pline_open;
 use cavalier_contours::polyline::*;
 
+use rand::rngs::StdRng;
+use rand::SeedableRng;
 use rand::Rng;
 
 fn main() {
@@ -17,38 +19,26 @@ fn view(app: &App, frame: Frame) {
 
     let mut rng = rand::thread_rng();
 
-    let vertex_list = generate_vertex_list(10);
+    let polyLine_vertex_list = generate_vertex_list(10);
 
     // Create a new polyline
-    let mut polyline = Polyline::with_capacity(vertex_list.len(), false);
+    let mut polyline = Polyline::with_capacity(polyLine_vertex_list.len(), false);
 
     // Add the vertices from the generated list
-    for (x, y, bulge) in vertex_list {
+    for (x, y, bulge) in polyLine_vertex_list {
         polyline.add_vertex(PlineVertex::new(x, y, bulge));
     }
 
+    polyline.parallel_offset(50.0);
+
+
 
     let polyline_vertex_data = &polyline.vertex_data;
-    let vec2_points = vertex_data_to_vec2(polyline_vertex_data);
 
     
-    // let v = &polyline.vertex_data;
 
-    // let mut offsettedPoints: Vec<Vec2> = Vec::new();
 
-    // for i in 0..v.len() {
-    //     let x = v[i].x as f32;
-    //     let y = v[i].y as f32;
-    //     let bulge = v[i].bulge;
-    //     // println!("x: {}, y: {}, bulge: {}", x, y, bulge);
-    //     // add to points
-    //     offsettedPoints.push(pt2(x, y));
-    // }
-    
-    draw.ellipse()
-        .x_y(0.0, 0.0)
-        .w_h(10.0, 10.0)
-        .color(WHITE);  
+    let vec2_points = vertexData_to_vec2List(polyline_vertex_data);
 
     // draw line from points
     draw.polyline()
@@ -57,12 +47,10 @@ fn view(app: &App, frame: Frame) {
         .color(RED);
         // .points_colored(pointss);
 
-    // // put everything on the frame
     draw.to_frame(app, &frame).unwrap();
 }
 
-
-fn vertex_data_to_vec2(vertex_data: &[PlineVertex<f64>]) -> Vec<Vec2> {
+fn vertexData_to_vec2List(vertex_data: &[PlineVertex<f64>]) -> Vec<Vec2> {
     let mut vec2_points: Vec<Vec2> = Vec::new();
 
     for vertex in vertex_data {
@@ -75,7 +63,10 @@ fn vertex_data_to_vec2(vertex_data: &[PlineVertex<f64>]) -> Vec<Vec2> {
 }
 
 fn generate_vertex_list(num_vertices: usize) -> Vec<(f64, f64, f64)> {
-        let mut rng = rand::thread_rng();
+        
+    // let mut rng = rand::thread_rng();
+    let seed = 42;
+    let mut rng = StdRng::seed_from_u64(seed);
 
     let range: f64 = 100.0;
 
@@ -91,14 +82,4 @@ fn generate_vertex_list(num_vertices: usize) -> Vec<(f64, f64, f64)> {
     vertex_list
 }
 
-fn randomPoints(amount: i32) -> Vec<Vec2> {
-    let mut rng = rand::thread_rng();
-    let mut points: Vec<Vec2> = Vec::new();
-    for _ in 0..amount {
-        let x: f32 = rng.gen_range(-10.0..10.0); // Adjust the range as needed
-        let y: f32 = rng.gen_range(-10.0..10.0); // Adjust the range as needed
-        points.push(pt2(x, y));
-    }
-    return points;
-}
 
