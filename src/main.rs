@@ -32,7 +32,16 @@ fn view(app: &App, frame: Frame) {
         polyline.add_vertex(PlineVertex::new(x, y, bulge));
     }
 
-    let offset_polyline = &polyline.parallel_offset(-50.0)[0];
+
+     let base_offset = -0.0;
+    let sin_amplitude = 50.0;
+    let sin_frequency = 1.0;
+    let pulsating_offset = (base_offset + sin_amplitude * (app.time * sin_frequency).sin()) as f64;
+
+    let offset_polyline = &polyline.parallel_offset(pulsating_offset)[0];
+
+
+    let offset_polyline = &polyline.parallel_offset(pulsating_offset)[0];
     // let offset_polyline = polyline;
 
     let vec2_points = vertex_data_to_vec2_list(&offset_polyline.vertex_data);
